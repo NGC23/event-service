@@ -1,0 +1,14 @@
+apiVersion: skaffold/v2beta26
+kind: Config
+metadata:
+ name: event-service
+build:
+ artifacts:
+ - image: ngc23/event-service
+   docker:
+     dockerfile: docker/Dockerfile
+deploy:
+ kubectl:
+   manifests:
+   - build/deployments.yaml
+   - build/service.yaml
