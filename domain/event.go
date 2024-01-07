@@ -1,7 +1,7 @@
 package domain
 
 type Event struct {
-	Id          string `json:"id,omitempty" db:"uuid"`
+	ID          string `json:"id,omitempty" db:"uuid"`
 	Name        string `json:"name" db:"name"`
 	Description string `json:"description" db:"description"`
 	StartDate   string `json:"start_date"  db:"start_date"`

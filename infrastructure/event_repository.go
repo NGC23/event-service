@@ -22,7 +22,7 @@ func NewEventsRepository(conn *sql.DB) domain.EventRepository {
 }
 
 func (r *eventRepository) Create(context *gin.Context, event *domain.Event) error {
-	event.Id = uuid.NewString()
+	event.ID = uuid.NewString()
 
 	_, err := r.conn.Exec(fmt.Sprintf("INSERT INTO `events` VALUES('%s', '%s', '%s', '%s', '%s', '%s')", event.Id, event.Name, event.Description, event.StartDate, event.EndDate, event.UserId))
 
