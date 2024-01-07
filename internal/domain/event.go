@@ -7,5 +7,5 @@ type Event struct {
 	StartDate   string `json:"start_date"  db:"start_date"`
 	EndDate     string `json:"end_date" db:"end_date"`
 	CreatedAt   string `json:"created_at,omitempty"`
-	UserId      string `json:"user_id" db:"user_id"`
+	UserID      string `json:"user_id" db:"user_id"`
 }

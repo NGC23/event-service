@@ -1,7 +1,7 @@
 package application
 
 import (
-	"event-service/domain"
+	"event-service/internal/domain"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +23,7 @@ func (c EventController) Create(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	err = c.Repository.Create(ctx, event)
+	err = c.Repository.Create(event)
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -33,7 +33,14 @@ func (c EventController) Create(ctx *gin.Context) {
 }
 
 func (c EventController) GetAll(ctx *gin.Context) {
-	result, err := c.Repository.GetAll(ctx)
+	userID := ctx.Param("userID")
+
+	if userID == "" {
+		//TODO: see if response is suitable for now just a bad request
+		ctx.AbortWithStatus(http.StatusBadRequest)
+	}
+
+	result, err := c.Repository.GetAll(userID)
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
