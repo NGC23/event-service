@@ -24,7 +24,7 @@ func NewEventsRepository(conn *sql.DB) domain.EventRepository {
 func (r *eventRepository) Create(context *gin.Context, event *domain.Event) error {
 	event.ID = uuid.NewString()
 
-	_, err := r.conn.Exec(fmt.Sprintf("INSERT INTO `events` VALUES('%s', '%s', '%s', '%s', '%s', '%s')", event.Id, event.Name, event.Description, event.StartDate, event.EndDate, event.UserId))
+	_, err := r.conn.Exec(fmt.Sprintf("INSERT INTO `events` VALUES('%s', '%s', '%s', '%s', '%s', '%s')", event.ID, event.Name, event.Description, event.StartDate, event.EndDate, event.UserID))
 
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func (r *eventRepository) GetAll(context *gin.Context) ([]domain.Event, error) {
 
 	for result.Next() {
 		var event domain.Event
-		if err := result.Scan(&event.Id, &event.Name, &event.Description, &event.StartDate, &event.EndDate, &event.UserId); err != nil {
+		if err := result.Scan(&event.ID, &event.Name, &event.Description, &event.StartDate, &event.EndDate, &event.UserID); err != nil {
 			return nil, err
 		}
 
