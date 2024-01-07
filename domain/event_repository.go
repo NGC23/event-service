@@ -7,4 +7,5 @@ import (
 type EventRepository interface {
 	GetAll(context *gin.Context) ([]Event, error)
 	Create(context *gin.Context, event *Event) error
+	Delete(context *gin.Context) error
 }

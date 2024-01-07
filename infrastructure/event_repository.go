@@ -21,8 +21,6 @@ func NewEventsRepository(conn *sql.DB) domain.EventRepository {
 	return &eventRepository{conn: conn}
 }
 
-//TODO: Create connection class/factory or whatever best practice go advises
-
 func (r *eventRepository) Create(context *gin.Context, event *domain.Event) error {
 	event.Id = uuid.NewString()
 
@@ -38,6 +36,7 @@ func (r *eventRepository) Create(context *gin.Context, event *domain.Event) erro
 func (r *eventRepository) GetAll(context *gin.Context) ([]domain.Event, error) {
 	var events []domain.Event
 
+	// TODO: make this user id specific context and add the index to user table for user_id
 	result, err := r.conn.Query("SELECT * FROM `events`")
 
 	if err != nil {
@@ -56,4 +55,8 @@ func (r *eventRepository) GetAll(context *gin.Context) ([]domain.Event, error) {
 	}
 
 	return events, nil
+}
+
+func (r *eventRepository) Delete(context *gin.Context) error {
+
 }
