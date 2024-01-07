@@ -58,5 +58,5 @@ func (r *eventRepository) GetAll(context *gin.Context) ([]domain.Event, error) {
 }
 
 func (r *eventRepository) Delete(context *gin.Context) error {
-
+	return nil
 }
