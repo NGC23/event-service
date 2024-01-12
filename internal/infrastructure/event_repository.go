@@ -44,10 +44,14 @@ func (r *eventRepository) GetAll(userID string) ([]domain.Event, error) {
 
 	for result.Next() {
 		var event domain.Event
+<<<<<<< HEAD:internal/infrastructure/event_repository.go
 
 		err := result.Scan(&event.ID, &event.Name, &event.Description, &event.StartDate, &event.EndDate, &event.UserID)
 
 		if err != nil {
+=======
+		if err := result.Scan(&event.ID, &event.Name, &event.Description, &event.StartDate, &event.EndDate, &event.UserID); err != nil {
+>>>>>>> b1b686a44dc8661e1e3e66938d8efd5e7553b21e:infrastructure/event_repository.go
 			return nil, err
 		}
 
