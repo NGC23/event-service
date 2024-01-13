@@ -19,16 +19,16 @@ func NewEventsRepository(conn *sql.DB) domain.EventRepository {
 	return &eventRepository{conn: conn}
 }
 
-func (r *eventRepository) Create(event *domain.Event) error {
-	event.ID = uuid.NewString()
+func (r *eventRepository) Create(e *domain.Event) (*domain.Event, error) {
+	e.ID = uuid.NewString()
 
-	_, err := r.conn.Exec(fmt.Sprintf("INSERT INTO `events` VALUES('%s', '%s', '%s', '%s', '%s', '%s')", event.ID, event.Name, event.Description, event.StartDate, event.EndDate, event.UserID))
+	_, err := r.conn.Exec(fmt.Sprintf("INSERT INTO `events` VALUES('%s', '%s', '%s', '%s', '%s', '%s')", e.ID, e.Name, e.Description, e.StartDate, e.EndDate, e.UserID))
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return e, nil
 }
 
 func (r *eventRepository) GetAll(userID string) ([]domain.Event, error) {
@@ -57,10 +57,30 @@ func (r *eventRepository) GetAll(userID string) ([]domain.Event, error) {
 	return events, nil
 }
 
+func (r *eventRepository) GetByID(ID string) (domain.Event, error) {
+	var e domain.Event
+
+	result, err := r.conn.Query(fmt.Sprintf("SELECT * FROM `events` WHERE `id`='%s'", ID))
+
+	if err != nil {
+		return e, err
+	}
+
+	defer result.Close()
+
+	err = result.Scan(&e.ID, &e.Name, &e.Description, &e.StartDate, &e.EndDate, &e.UserID)
+
+	if err != nil {
+		return e, err
+	}
+
+	return e, nil
+}
+
 func (r *eventRepository) Delete(eventID string) error {
 	return nil
 }
 
-func (r *eventRepository) Update(event *domain.Event) (domain.Event, error) {
-	return domain.Event{}, nil
+func (r *eventRepository) Update(event *domain.Event) error {
+	return nil
 }
