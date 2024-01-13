@@ -77,7 +77,13 @@ func (r *eventRepository) GetByID(ID string) (domain.Event, error) {
 	return e, nil
 }
 
-func (r *eventRepository) Delete(eventID string) error {
+func (r *eventRepository) Delete(ID string) error {
+	_, err := r.conn.Query(fmt.Sprintf("DELETE FROM `events` WHERE `id`='%s'", ID))
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
