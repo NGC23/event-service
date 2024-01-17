@@ -10,7 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	cors "github.com/itsjamie/gin-cors"
-	//Testing the client
 )
 
 func main() {
@@ -26,7 +25,6 @@ func readinessHandler(context *gin.Context) {
 }
 
 func serveApplication() {
-	router := gin.Default()
 
 	conn, err := sql.Open("mysql", "neil:gym4life@tcp(jeeves-mysql:3306)/jeeves_api")
 
@@ -40,6 +38,8 @@ func serveApplication() {
 	ec := application.EventController{
 		Repository: er,
 	}
+
+	router := gin.Default()
 
 	router.Use(cors.Middleware(cors.Config{
 		Origins:         "*",

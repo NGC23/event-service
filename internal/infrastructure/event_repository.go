@@ -5,8 +5,8 @@ import (
 	"event-service/internal/domain"
 	"fmt"
 
+	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/google/uuid"
 )
 
 // eventRepository Implements domain.EventRepository
@@ -19,10 +19,9 @@ func NewEventsRepository(conn *sql.DB) domain.EventRepository {
 	return &eventRepository{conn: conn}
 }
 
-func (r *eventRepository) Create(e *domain.Event) (*domain.Event, error) {
-	e.ID = uuid.NewString()
-
-	_, err := r.conn.Exec(fmt.Sprintf("INSERT INTO `events` VALUES('%s', '%s', '%s', '%s', '%s', '%s')", e.ID, e.Name, e.Description, e.StartDate, e.EndDate, e.UserID))
+func (r *eventRepository) Create(ctx *gin.Context, e *domain.Event) (*domain.Event, error) {
+	// _, err := r.conn.Exec(fmt.Sprintf("INSERT INTO `events` (`uuid`, `name`, `description`, `start_date`, `end_date`, `user_id`) VALUES('%s', '%s', '%s', '%s', '%s', '%s')", e.ID, e.Name, e.Description, e.StartDate, e.EndDate, e.UserID))
+	_, err := r.conn.ExecContext(ctx, "INSERT INTO `events` (`uuid`, `name`, `description`, `start_date`, `end_date`, `user_id`) VALUES(?,?,?,?,?,?)", e.ID, e.Name, e.Description, e.StartDate, e.EndDate, e.UserID)
 
 	if err != nil {
 		return nil, err
@@ -31,7 +30,7 @@ func (r *eventRepository) Create(e *domain.Event) (*domain.Event, error) {
 	return e, nil
 }
 
-func (r *eventRepository) GetAll(userID string) ([]domain.Event, error) {
+func (r *eventRepository) GetAll(ctx *gin.Context, userID string) ([]domain.Event, error) {
 	var events []domain.Event
 
 	result, err := r.conn.Query(fmt.Sprintf("SELECT * FROM `events` WHERE `user_id`='%s'", userID))
@@ -57,7 +56,7 @@ func (r *eventRepository) GetAll(userID string) ([]domain.Event, error) {
 	return events, nil
 }
 
-func (r *eventRepository) GetByID(ID string) (domain.Event, error) {
+func (r *eventRepository) GetByID(ctx *gin.Context, ID string) (domain.Event, error) {
 	var e domain.Event
 
 	result, err := r.conn.Query(fmt.Sprintf("SELECT * FROM `events` WHERE `id`='%s'", ID))
@@ -77,7 +76,7 @@ func (r *eventRepository) GetByID(ID string) (domain.Event, error) {
 	return e, nil
 }
 
-func (r *eventRepository) Delete(ID string) error {
+func (r *eventRepository) Delete(ctx *gin.Context, ID string) error {
 	_, err := r.conn.Query(fmt.Sprintf("DELETE FROM `events` WHERE `id`='%s'", ID))
 
 	if err != nil {
@@ -87,6 +86,6 @@ func (r *eventRepository) Delete(ID string) error {
 	return nil
 }
 
-func (r *eventRepository) Update(event *domain.Event) error {
+func (r *eventRepository) Update(ctx *gin.Context, event *domain.Event) error {
 	return nil
 }

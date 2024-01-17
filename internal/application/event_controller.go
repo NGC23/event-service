@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // EventController provides use-case
@@ -19,12 +20,16 @@ func (c EventController) Create(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
-	e, err := c.Repository.Create(&event)
+	event.ID = uuid.NewString()
+
+	e, err := c.Repository.Create(ctx, &event)
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
 	ctx.JSON(http.StatusCreated, e)
@@ -43,7 +48,7 @@ func (c EventController) GetAll(ctx *gin.Context) {
 		return
 	}
 
-	result, err := c.Repository.GetAll(userID)
+	result, err := c.Repository.GetAll(ctx, userID)
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -61,7 +66,7 @@ func (c EventController) GetByID(ctx *gin.Context) {
 		return
 	}
 
-	result, err := c.Repository.GetByID(ID)
+	result, err := c.Repository.GetByID(ctx, ID)
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -79,7 +84,7 @@ func (c EventController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	err := c.Repository.Delete(ID)
+	err := c.Repository.Delete(ctx, ID)
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
