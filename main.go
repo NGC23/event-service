@@ -51,10 +51,11 @@ func serveApplication() {
 		ValidateHeaders: false,
 	}))
 
-	router.POST("/events/create", ec.Create)
 	router.GET("/events/:userID", ec.GetAll)
 	router.GET("/events/details/:ID", ec.GetByID)
-	router.GET("/events/delete/:ID", ec.Delete)
+	router.POST("/events/create", ec.Create)
+	router.PUT("/events/update/:ID", ec.Delete)
+	router.DELETE("/events/delete/:ID", ec.Delete)
 	router.GET("/health", healthHandler)
 	router.GET("/readiness", readinessHandler)
 

@@ -25,7 +25,7 @@ func (c EventController) Create(ctx *gin.Context) {
 
 	event.ID = uuid.NewString()
 
-	e, err := c.Repository.Create(ctx, &event)
+	e, err := c.Repository.Create(&event)
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -48,7 +48,7 @@ func (c EventController) GetAll(ctx *gin.Context) {
 		return
 	}
 
-	result, err := c.Repository.GetAll(ctx, userID)
+	result, err := c.Repository.GetAll(userID)
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -66,7 +66,7 @@ func (c EventController) GetByID(ctx *gin.Context) {
 		return
 	}
 
-	result, err := c.Repository.GetByID(ctx, ID)
+	result, err := c.Repository.GetByID(ID)
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -84,7 +84,7 @@ func (c EventController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	err := c.Repository.Delete(ctx, ID)
+	err := c.Repository.Delete(ID)
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
