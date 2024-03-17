@@ -1,9 +1,8 @@
-package tests
+package application
 
 import (
 	"bytes"
 	"encoding/json"
-	"event-service/internal/application"
 	"event-service/internal/domain"
 	"event-service/mocks"
 	"net/http"
@@ -17,7 +16,7 @@ import (
 
 func TestCreateWillFailWith400WhenBodyIsEmpty(t *testing.T) {
 	erm := new(mocks.EventRepository)
-	ec := &application.EventController{Repository: erm}
+	ec := EventController{Repository: erm}
 
 	w := httptest.NewRecorder()
 
@@ -32,7 +31,7 @@ func TestCreateWillFailWith400WhenBodyIsEmpty(t *testing.T) {
 
 func TestCreateOK(t *testing.T) {
 	erm := new(mocks.EventRepository)
-	ec := &application.EventController{Repository: erm}
+	ec := EventController{Repository: erm}
 
 	e := domain.Event{
 		ID:          "",
@@ -61,7 +60,7 @@ func TestCreateOK(t *testing.T) {
 
 func TestDeleteOk(t *testing.T) {
 	erm := new(mocks.EventRepository)
-	ec := &application.EventController{Repository: erm}
+	ec := EventController{Repository: erm}
 
 	erm.On("Delete", mock.Anything).Return(nil)
 
@@ -78,7 +77,7 @@ func TestDeleteOk(t *testing.T) {
 
 func TestDeleteNotOkWhenNoIDProvided(t *testing.T) {
 	erm := new(mocks.EventRepository)
-	ec := &application.EventController{Repository: erm}
+	ec := EventController{Repository: erm}
 
 	w := httptest.NewRecorder()
 
