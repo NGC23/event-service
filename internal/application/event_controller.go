@@ -25,14 +25,14 @@ func (c EventController) Create(ctx *gin.Context) {
 
 	event.ID = uuid.NewString()
 
-	e, err := c.Repository.Create(&event)
+	err = c.Repository.Create(&event)
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, e)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (c EventController) Update(ctx *gin.Context) {

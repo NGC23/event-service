@@ -17,14 +17,14 @@ func NewEventsRepository(conn *sql.DB) domain.EventRepository {
 	return &eventRepository{conn: conn}
 }
 
-func (r *eventRepository) Create(e *domain.Event) (*domain.Event, error) {
+func (r *eventRepository) Create(e *domain.Event) error {
 	_, err := r.conn.Exec("INSERT INTO `events` (`uuid`, `name`, `description`, `created_at`, `start_date`, `end_date`, `user_id`) VALUES(?,?,?,?,?,?,?)", e.ID, e.Name, e.Description, e.CreatedAt, e.StartDate, e.EndDate, e.UserID)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return e, nil
+	return nil
 }
 
 func (r *eventRepository) GetAll(userID string) ([]domain.Event, error) {

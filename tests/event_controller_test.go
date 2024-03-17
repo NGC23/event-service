@@ -2,49 +2,40 @@ package tests
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"event-service/internal/application"
 	"event-service/internal/domain"
-	"event-service/internal/infrastructure"
-	"log"
+	"event-service/mocks"
 	"net/http"
 	"net/http/httptest"
-	"regexp"
 	"testing"
 
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestCreateWillFailWith400WhenBodyIsEmpty(t *testing.T) {
-	db, _, err := sqlmock.New()
-
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database", err)
-	}
-
-	defer db.Close()
-
-	er := infrastructure.NewEventsRepository(db)
-	ec := application.EventController{
-		Repository: er,
-	}
+	erm := new(mocks.EventRepository)
+	ec := &application.EventController{Repository: erm}
 
 	w := httptest.NewRecorder()
+
 	_, engine := gin.CreateTestContext(w)
 	engine.POST("/events/create", ec.Create)
-	req, _ := http.NewRequest("POST", "/events/create", nil)
+
+	req, _ := http.NewRequest(http.MethodPost, "/events/create", nil)
 	engine.ServeHTTP(w, req)
 
-	assert.Equal(t, w.Code, 400)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 
 func TestCreateOK(t *testing.T) {
-	db, mock := NewMock()
+	erm := new(mocks.EventRepository)
+	ec := &application.EventController{Repository: erm}
 
 	e := domain.Event{
+		ID:          "",
 		Name:        "blah",
 		UserID:      "random-user-id",
 		StartDate:   "2024-01-14 20:08:56",
@@ -53,27 +44,49 @@ func TestCreateOK(t *testing.T) {
 		Description: "This is a test",
 	}
 
-	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `events` (`uuid`, `name`, `description`, `start_date`, `end_date`, `user_id`) VALUES(?,?,?,?,?,?)")).WithArgs(sqlmock.AnyArg(), e.Name, e.Description, e.StartDate, e.EndDate, e.UserID).WillReturnResult(sqlmock.NewResult(0, 0))
-
-	er := infrastructure.NewEventsRepository(db)
-	ec := &application.EventController{Repository: er}
+	erm.On("Create", mock.Anything).Return(nil)
 
 	json, _ := json.Marshal(e)
 
 	w := httptest.NewRecorder()
+
 	_, engine := gin.CreateTestContext(w)
 	engine.POST("/events/create", ec.Create)
-	req, _ := http.NewRequest("POST", "/events/create", bytes.NewBuffer((json)))
+
+	req, _ := http.NewRequest(http.MethodPost, "/events/create", bytes.NewBuffer((json)))
 	engine.ServeHTTP(w, req)
 
-	assert.Equal(t, w.Code, 201)
+	assert.Equal(t, http.StatusCreated, w.Code)
 }
 
-func NewMock() (*sql.DB, sqlmock.Sqlmock) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		log.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+func TestDeleteOk(t *testing.T) {
+	erm := new(mocks.EventRepository)
+	ec := &application.EventController{Repository: erm}
 
-	return db, mock
+	erm.On("Delete", mock.Anything).Return(nil)
+
+	w := httptest.NewRecorder()
+
+	_, engine := gin.CreateTestContext(w)
+	engine.DELETE("/events/delete/:ID", ec.Delete)
+
+	req, _ := http.NewRequest(http.MethodDelete, "/events/delete/user-test-id", nil)
+	engine.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNoContent, w.Code)
+}
+
+func TestDeleteNotOkWhenNoIDProvided(t *testing.T) {
+	erm := new(mocks.EventRepository)
+	ec := &application.EventController{Repository: erm}
+
+	w := httptest.NewRecorder()
+
+	_, engine := gin.CreateTestContext(w)
+	engine.DELETE("/events/delete/:ID", ec.Delete)
+
+	req, _ := http.NewRequest(http.MethodDelete, "/events/delete/", nil)
+	engine.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
 }
